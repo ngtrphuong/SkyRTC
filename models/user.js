@@ -1,5 +1,5 @@
 /**
- * 用户model
+ * User model
  * Created by killer on 2016/10/24.
  */
 var mongoose = require('mongoose');

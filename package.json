@@ -1,6 +1,6 @@
 {
   "name": "SkyRTC-demo",
-  "description": "A simple SkyRTC demo",
+  "description": "This is the simple SkyRTC demo",
   "scripts": {
     "start": "npm run server",
     "server": "node server.js"

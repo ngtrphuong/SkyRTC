@@ -18,7 +18,7 @@ $('#msgIpt').keypress(function(e){
             msg = msgIpt.value,
             p = document.createElement("p");
         p.innerText = "me: " + msg;
-        //广播消息
+        //Broadcast message
         rtc.broadcast(msg);
         msgIpt.value = "";
         msgs.appendChild(p);
@@ -31,7 +31,7 @@ sendBtn.onclick = function(event){
         msg = msgIpt.value,
         p = document.createElement("p");
     p.innerText = "me: " + msg;
-    //广播消息
+    //Broadcast message
     rtc.broadcast(msg);
     msgIpt.value = "";
     msgs.appendChild(p);
@@ -39,80 +39,80 @@ sendBtn.onclick = function(event){
 };
 
 sendFileBtn.onclick = function(event){
-    //分享文件
+    //Share files
     rtc.shareFile("fileIpt");
 };
 /**********************************************************/
 
 
 
-//对方同意接收文件
+//The other party agrees to receive the file
 rtc.on("send_file_accepted", function(sendId, socketId, file){
     var p = document.getElementById("sf-" + sendId);
-    p.innerText = "对方接收" + file.name + "文件，等待发送";
+    p.innerText = "Received by the other party " + file.name + " file, waiting to be sent";
 
 });
-//对方拒绝接收文件
+//The other party refused to receive the file
 rtc.on("send_file_refused", function(sendId, socketId, file){
     var p = document.getElementById("sf-" + sendId);
-    p.innerText = "对方拒绝接收" + file.name + "文件";
+    p.innerText = "The other party refuses to accept " + file.name + " file";
 });
-//请求发送文件
+//Request file
 rtc.on('send_file', function(sendId, socketId, file){
     var p = document.createElement("p");
-    p.innerText = "请求发送" + file.name + "文件";
+    p.innerText = "Request to send " + file.name + " file";
     p.id = "sf-" + sendId;
     msgs.appendChild(p);
 });
-//文件发送成功
+//File sent successfully
 rtc.on('sended_file', function(sendId, socketId, file){
     var p = document.getElementById("sf-" + sendId);
     p.parentNode.removeChild(p);
 });
-//发送文件碎片
+//Send file fragments
 rtc.on('send_file_chunk', function(sendId, socketId, percent, file){
     var p = document.getElementById("sf-" + sendId);
-    p.innerText = file.name + "文件正在发送: " + Math.ceil(percent) + "%";
+    p.innerText = file.name + "File is sending: " + Math.ceil(percent) + "%";
 });
-//接受文件碎片
+//Accept file fragmentation
 rtc.on('receive_file_chunk', function(sendId, socketId, fileName, percent){
     var p = document.getElementById("rf-" + sendId);
-    p.innerText = "正在接收" + fileName + "文件：" +  Math.ceil(percent) + "%";
+    p.innerText = "Receiving " + fileName + " file： " +  Math.ceil(percent) + "%";
 });
-//接收到文件
+//File received
 rtc.on('receive_file', function(sendId, socketId, name){
     var p = document.getElementById("rf-" + sendId);
     p.parentNode.removeChild(p);
 });
-//发送文件时出现错误
+//An error occurred while sending the file
 rtc.on('send_file_error', function(error){
     console.log(error);
 });
-//接收文件时出现错误
+//An error occurred while receiving the file
 rtc.on('receive_file_error', function(error){
     console.log(error);
 });
-//接受到文件发送请求
+//File sending request received
 rtc.on('receive_file_ask', function(sendId, socketId, fileName, fileSize){
     var p;
-    if (window.confirm(socketId + "用户想要给你传送" + fileName + "文件，大小" + fileSize + "KB,是否接受？")) {
+    if (window.confirm(socketId + " user wants to send you " + fileName + " file with size " + fileSize + "KB, accept?")) {
         rtc.sendFileAccept(sendId);
         p = document.createElement("p");
-        p.innerText = "准备接收" + fileName + "文件";
+        p.innerText = "Ready to receive " + fileName + " file";
         p.id = "rf-" + sendId;
         msgs.appendChild(p);
     } else {
         rtc.sendFileRefuse(sendId);
     }
 });
-//成功创建WebSocket连接
+//Successfully created WebSocket connection
 rtc.on("connected", function(socket) {
-    //创建本地视频流
+    //Create a local video stream
     rtc.createStream({
         "video": true,
         "audio": true
     });
-    //创建成功ajax将socketid发送回服务器
+    //Successfully created AJAX sends the socketid back to the server
     $.post(
         "connectSuccess",
         {
@@ -120,16 +120,16 @@ rtc.on("connected", function(socket) {
         }
     );
 });
-//创建本地视频流成功
+//Create local video stream successfully
 rtc.on("stream_created", function(stream) {
     document.getElementById('me').src = URL.createObjectURL(stream);
     document.getElementById('me').play();
 });
-//创建本地视频流失败
+//Failed to create local video stream
 rtc.on("stream_create_error", function() {
     alert("create stream failed!");
 });
-//接收到其他用户的视频流
+//Receive video streams from other users
 rtc.on('pc_add_stream', function(stream, socketId) {
     var newDiv = document.createElement("div");
     newDiv.setAttribute("class","brick small");
@@ -149,18 +149,18 @@ rtc.on('pc_add_stream', function(stream, socketId) {
     rtc.attachStream(stream, id);
     $('.gridly').gridly('layout');
 });
-//删除其他用户
+//Delete other users
 rtc.on('remove_peer', function(socketId) {
     var video = document.getElementById('other-' + socketId);
     if(video){
         video.parentNode.parentNode.parentNode.removeChild(video.parentNode.parentNode);
     }
 });
-//接收到文字信息
+//Text message received
 rtc.on('data_channel_message', function(channel, socketId, message){
     var p = document.createElement("p");
     p.innerText = socketId + ": " + message;
     msgs.appendChild(p);
 });
-//连接WebSocket服务器
+//Connect to WebSocket server
 rtc.connect("wss:" + window.location.href.substring(window.location.protocol.length).split('#')[0], window.location.hash.slice(1));

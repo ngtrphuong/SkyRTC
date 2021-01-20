@@ -16,7 +16,7 @@ var User = require('./models/user');
 
 var key = fs.readFileSync('keys/newkey.pem');
 var cert = fs.readFileSync('keys/cert.pem');
-//https密钥
+//https key
 var https_options = {
     key: key,
     cert: cert
@@ -27,7 +27,7 @@ var SkyRTC = require('skyrtc').listen(server);
 var port = process.env.PORT || 443;
 server.listen(port);
 
-//配置请求头
+//Configure request header
 app.all('*', function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "X-Requested-With");
@@ -36,55 +36,55 @@ app.all('*', function(req, res, next) {
     next();
 });
 
-//链接mongodb数据库
+//Link to mongodb database
 mongoose.connect('mongodb://localhost/skyRtc');
 
-//配置公共资源文件夹
+//Configure the public resource folder
 app.use(express.static(path.join(__dirname, 'public')));
 
-//配置post请求
+//Configure post request
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-//配置cookie
+//Configure cookies
 app.use(cookieParser());
 
-//配置前端模版为ejs
+//Configure the front-end template as ejs
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
 SkyRTC.rtc.on('new_connect', function(socket) {
-    console.log('创建新连接');
+    console.log('Create new connection');
 });
 
 SkyRTC.rtc.on('remove_peer', function(socketId) {
     roomList.leaveRoom(socketId);
-    console.log(socketId + "用户离开");
+    console.log(socketId + " user left");
 });
 
 SkyRTC.rtc.on('new_peer', function(socket, room) {
     roomList.enterRoomSocket(room, socket.id);
-    console.log("新用户" + socket.id + "加入房间" + room);
+    console.log("new user " + socket.id + " join room " + room);
 });
 
 SkyRTC.rtc.on('socket_message', function(socket, msg) {
-    console.log("接收到来自" + socket.id + "的新消息：" + msg);
+    console.log("Received from " + socket.id + " new message： " + msg);
 });
 
 SkyRTC.rtc.on('ice_candidate', function(socket, ice_candidate) {
-    console.log("接收到来自" + socket.id + "的ICE Candidate");
+    console.log("Received from " + socket.id + " the ICE Candidate");
 });
 
 SkyRTC.rtc.on('offer', function(socket, offer) {
-    console.log("接收到来自" + socket.id + "的Offer");
+    console.log("Received from " + socket.id + " the Offer");
 });
 
 SkyRTC.rtc.on('answer', function(socket, answer) {
-    console.log("接收到来自" + socket.id + "的Answer");
+    console.log("Received from " + socket.id + " the Answer");
 });
 
 SkyRTC.rtc.on('error', function(error) {
-    console.log("发生错误：" + error.message);
+    console.log("An error occurred： " + error.message);
 });
 
 app.use(session({
@@ -92,7 +92,7 @@ app.use(session({
     resave: true,
     saveUninitialized: false,
     cookie:{
-        maxAge: 1000*60*100 //cookie有效时间10min
+        maxAge: 1000*60*100 //Cookie valid time 10min
     }
 }));
 
@@ -143,12 +143,12 @@ app.post('/login', function (req, res) {
             res.render('error',{'message':err})
         }else{
             if(date==null){
-                res.render('index',{'message':'用户名或密码错误！'});
+                res.render('index',{'message':'Wrong username of password!'});
             }else if(req.body.username==date.username&&req.body.password==date.password){
                 req.session.user = date;
                 res.redirect('/roomList');
             }else{
-                res.render('index',{'message':'用户名或密码错误！'});
+                res.render('index',{'message':'Wrong username of password！'});
             }
         }
     });
@@ -172,9 +172,9 @@ app.post('/addAdmin', function (req, res) {
     });
     user.save(function (err) {
         if (err){
-            res.render('state',{state:'添加用户失败！'});
+            res.render('state',{state:'Failed to add user！'});
         }else{
-            res.render('state',{state:'添加用户成功！'});
+            res.render('state',{state:'User added successfully！'});
         }
     });
 });
@@ -204,7 +204,7 @@ var isAdmin = function () {
     return true;
 };
 
-//判断用户是否登陆
+//Determine whether the user is logged in
 var haveLogined = function (user) {
     if(typeof(user) == "undefined"){
         return false;
